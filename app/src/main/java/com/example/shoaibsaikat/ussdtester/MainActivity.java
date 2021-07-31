@@ -45,10 +45,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     // for Activity#requestPermissions for more details.
                     return;
                 } else {
-                    manager.sendUssdRequest("*124#", new TelephonyManager.UssdResponseCallback() {
+                    manager.sendUssdRequest("*152#", new TelephonyManager.UssdResponseCallback() {
                         @Override
                         public void onReceiveUssdResponse(TelephonyManager telephonyManager, String request, CharSequence response) {
-                            Log.e("DEBUG", response.toString());
+                            Log.d("DEBUG", response.toString());
                             tvLog.setText(response.toString());
                         }
 
