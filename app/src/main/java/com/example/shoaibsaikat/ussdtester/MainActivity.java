@@ -47,6 +47,8 @@ public class MainActivity extends Activity {
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for Activity#requestPermissions for more details.
+                    Log.e(LOG_TAG, "CALL_PHONE permission failure");
+                    tvLog.setText("Consider giving call permission to this app from settings > app menu");
                     return;
                 } else {
                     TelephonyManager manager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
