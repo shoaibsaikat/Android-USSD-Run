@@ -10,12 +10,16 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends Activity {
+
+    private static final String LOG_TAG = "USSD";
 
     private Button bCall;
     private TextView tvLog;
+    private EditText etUSSD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,18 +27,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         bCall = findViewById(R.id.button);
-        bCall.setOnClickListener(this);
-        tvLog = findViewById(R.id.textView);
-    }
+        bCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "Call button clicked, please wait for response...");
+                tvLog.setText("Call button clicked, please wait for response...");
+                String USSDCode = etUSSD.getText().toString();
+                if (USSDCode == null || USSDCode == "") {
+                    Log.e(LOG_TAG, "USSD code not found");
+                    tvLog.setText("USSD code not found");
+                    return;
+                }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button:
-                String ussdCode = "*" + "124" + Uri.encode("#");
-                //startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + ussdCode)));
-
-                TelephonyManager manager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
                 if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    Activity#requestPermissions
@@ -45,20 +49,24 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     // for Activity#requestPermissions for more details.
                     return;
                 } else {
-                    manager.sendUssdRequest("*152#", new TelephonyManager.UssdResponseCallback() {
+                    TelephonyManager manager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+                    manager.sendUssdRequest(USSDCode, new TelephonyManager.UssdResponseCallback() {
                         @Override
                         public void onReceiveUssdResponse(TelephonyManager telephonyManager, String request, CharSequence response) {
-                            Log.d("DEBUG", response.toString());
+                            Log.i(LOG_TAG, response.toString());
                             tvLog.setText(response.toString());
                         }
 
                         @Override
                         public void onReceiveUssdResponseFailed(TelephonyManager telephonyManager, String request, int failureCode) {
-                            Log.e("DEBUG", Integer.toString(failureCode));
+                            Log.e(LOG_TAG, Integer.toString(failureCode));
+                            tvLog.setText(Integer.toString(failureCode));
                         }
                     }, new Handler());
                 }
-                break;
-        }
+            }
+        });
+        tvLog = findViewById(R.id.textView);
+        etUSSD = findViewById(R.id.editTextUSSD);
     }
 }
